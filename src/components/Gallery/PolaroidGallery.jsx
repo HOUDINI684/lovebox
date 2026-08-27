@@ -24,7 +24,6 @@ export default function PolaroidGallery({ photos = [], onNext, theme, mode = 'si
     else setIndex((i) => i + 1)
   }
 
-  // Mode montage : avance automatiquement, sans besoin de toucher l'ecran
   useEffect(() => {
     if (mode !== 'montage' || photos.length === 0) return
     timerRef.current = setTimeout(advance, 3000 * speed)
@@ -49,20 +48,22 @@ export default function PolaroidGallery({ photos = [], onNext, theme, mode = 'si
     >
       <h2 className="font-display text-2xl text-ivory mb-8">Vos souvenirs</h2>
 
-      <div className="relative w-full max-w-sm aspect-square overflow-hidden rounded-2xl shadow-2xl shadow-black/50 bg-night-800">
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={index}
-            src={photo.url}
-            alt={photo.caption || ''}
-            initial={{ opacity: 0, scale: 1 }}
-            animate={{ opacity: 1, scale: 1.18 }}
-            exit={{ opacity: 0 }}
-            transition={{ opacity: { duration: 0.4 }, scale: { duration: 3 * speed, ease: 'easeOut' } }}
-            className="w-full h-full object-cover"
-            style={{ filter: photoFilter }}
-          />
-        </AnimatePresence>
+      <div className="relative w-full max-w-sm aspect-square bg-ivory p-3 pb-8 shadow-2xl shadow-black/50 rounded-sm">
+        <div className="relative w-full h-full overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={index}
+              src={photo.url}
+              alt={photo.caption || ''}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="w-full h-full object-cover"
+              style={{ filter: photoFilter }}
+            />
+          </AnimatePresence>
+        </div>
       </div>
 
       {photo.caption && (

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getLovebox } from '../services/loveboxService'
@@ -15,15 +15,6 @@ import MiniGame from '../components/Games/MiniGame'
 import LetterView from '../components/Letter/LetterView'
 import InteractiveHeart from '../components/Heart/InteractiveHeart'
 
-function shuffle(array) {
-  const arr = [...array]
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
-  return arr
-}
-
 export default function Recipient() {
   const { loveboxId } = useParams()
   const { currentStep, setCurrentStep } = useLovebox()
@@ -37,9 +28,6 @@ export default function Recipient() {
       .then(setLovebox)
       .catch((err) => setError(err.message))
   }, [loveboxId])
-
-  // Ordre des photos melange a chaque ouverture, pour une experience differente a chaque fois
-  const shuffledPhotos = useMemo(() => (lovebox ? shuffle(lovebox.photos || []) : []), [lovebox])
 
   const introAudio = useAudio(lovebox?.audioIntro || null)
   const letterAudio = useAudio(lovebox?.audioLetter || null)
@@ -91,7 +79,7 @@ export default function Recipient() {
             />
           )}
           {currentStep === 'gallery' && (
-            <PolaroidGallery photos={shuffledPhotos} theme={theme} mode={galleryMode} onNext={leaveGallery} />
+            <PolaroidGallery photos={lovebox.photos} theme={theme} mode={galleryMode} onNext={leaveGallery} />
           )}
           {currentStep === 'video' && lovebox.video && (
             <VideoPlayer url={lovebox.video} theme={theme} onEnded={() => setCurrentStep('game')} />
