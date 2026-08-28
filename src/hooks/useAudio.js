@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { AUDIO_SETTINGS } from '../config/audio'
+import { optimizeAudio } from '../config/mediaTransform'
 
 export function useAudio(url) {
   const audioRef = useRef(null)
@@ -8,9 +9,10 @@ export function useAudio(url) {
 
   useEffect(() => {
     if (!url) return
-    const audio = new Audio(url)
+    const audio = new Audio(optimizeAudio(url))
     audio.volume = volume
-    audio.loop = true // la musique reprend en boucle si elle se termine avant la fin de l'experience
+    audio.loop = true
+    audio.preload = 'auto'
     audio.addEventListener('error', () => console.warn(`[LOVEBOX] Fichier audio introuvable: ${url}`))
     audioRef.current = audio
     return () => { audio.pause(); audioRef.current = null }

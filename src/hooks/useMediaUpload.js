@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react'
 import { CLOUDINARY_CONFIG } from '../config/cloudinary'
+import { warmMediaUrl } from '../config/mediaTransform'
 
 const MAX_AUDIO_MB = 50
-const MAX_VIDEO_MB = 500
+const MAX_VIDEO_MB = 200
 
 export function useMediaUpload() {
   const [progress, setProgress] = useState(0)
@@ -33,7 +34,9 @@ export function useMediaUpload() {
       xhr.onload = () => {
         setUploading(false)
         if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(JSON.parse(xhr.responseText).secure_url)
+          const url = JSON.parse(xhr.responseText).secure_url
+          warmMediaUrl(url, type)
+          resolve(url)
         } else {
           const err = new Error("Echec de l'upload Cloudinary")
           setError(err.message); reject(err)
