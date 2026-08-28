@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// Insere des parametres d'optimisation Cloudinary (qualite auto, format auto,
+// largeur plafonnee) pour un chargement rapide meme sur un appareil sans cache.
+function optimizeCloudinaryImage(url) {
+  if (!url || !url.includes('/upload/')) return url
+  return url.replace('/upload/', '/upload/q_auto,f_auto,w_800/')
+}
+
 export default function PolaroidGallery({ photos = [], onNext, theme, mode = 'single' }) {
   const [index, setIndex] = useState(0)
+  const [loaded, setLoaded] = useState(false)
   const timerRef = useRef(null)
   const accent = theme?.accent ?? '#FF3D68'
   const speed = theme?.speed ?? 1
@@ -19,16 +27,21 @@ export default function PolaroidGallery({ photos = [], onNext, theme, mode = 'si
   const isLast = index === photos.length - 1
   const photo = photos[index]
 
+  useEffect(() => {
+    setLoaded(false)
+  }, [index])
+
   const advance = () => {
     if (isLast) onNext()
     else setIndex((i) => i + 1)
   }
 
+  // Mode montage : avance automatiquement une fois la photo chargee, sans besoin de toucher l'ecran
   useEffect(() => {
-    if (mode !== 'montage' || photos.length === 0) return
+    if (mode !== 'montage' || photos.length === 0 || !loaded) return
     timerRef.current = setTimeout(advance, 3000 * speed)
     return () => clearTimeout(timerRef.current)
-  }, [mode, index, photos.length, speed])
+  }, [mode, index, photos.length, speed, loaded])
 
   if (photos.length === 0) {
     return (
@@ -49,16 +62,27 @@ export default function PolaroidGallery({ photos = [], onNext, theme, mode = 'si
       <h2 className="font-display text-2xl text-ivory mb-8">Vos souvenirs</h2>
 
       <div className="relative w-full max-w-sm aspect-square bg-ivory p-3 pb-8 shadow-2xl shadow-black/50 rounded-sm">
-        <div className="relative w-full h-full overflow-hidden">
+        <div className="relative w-full h-full overflow-hidden bg-night-700">
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                className="w-7 h-7 border-2 border-night-600 rounded-full"
+                style={{ borderTopColor: accent }}
+              />
+            </div>
+          )}
           <AnimatePresence mode="wait">
             <motion.img
               key={index}
-              src={photo.url}
+              src={optimizeCloudinaryImage(photo.url)}
               alt={photo.caption || ''}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: loaded ? 1 : 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
+              onLoad={() => setLoaded(true)}
               className="w-full h-full object-cover"
               style={{ filter: photoFilter }}
             />
