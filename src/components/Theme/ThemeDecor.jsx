@@ -13,10 +13,11 @@ export default function ThemeDecor({ themeId }) {
     delay: rand(0, 3),
   })), [])
 
+  const bubbles = useMemo(() => Array.from({ length: 14 }, (_, i) => ({
+    id: i, left: rand(0, 100), size: rand(6, 16), duration: rand(6, 12), delay: rand(0, 5),
+  })), [])
+
   if (themeId === 'ocean') {
-    const bubbles = useMemo(() => Array.from({ length: 14 }, (_, i) => ({
-      id: i, left: rand(0, 100), size: rand(6, 16), duration: rand(6, 12), delay: rand(0, 5),
-    })), [])
     return (
       <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
         {bubbles.map((b) => (

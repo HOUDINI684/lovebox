@@ -1,16 +1,15 @@
-import { doc, setDoc, getDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
 import { db } from './firebase'
 
-export async function createLovebox(studioData) {
-  const ref = doc(collection(db, 'loveboxes'))
-  const payload = { ...studioData, id: ref.id, paid: false, heartTouched: false, createdAt: serverTimestamp() }
-  await setDoc(ref, payload)
-  return ref.id
-}
-
+// La creation passe par /api/initialize-payment : le client n'ecrit plus dans Firestore.
 export async function getLovebox(loveboxId) {
-  const ref = doc(db, 'loveboxes', loveboxId)
-  const snap = await getDoc(ref)
-  if (!snap.exists()) throw new Error('LOVEBOX introuvable')
-  return snap.data()
+  try {
+    const snap = await getDoc(doc(db, 'loveboxes', loveboxId))
+    if (!snap.exists()) throw new Error('LOVEBOX introuvable')
+    return snap.data()
+  } catch (error) {
+    // Les regles Firestore refusent la lecture tant que le paiement n'est pas confirme.
+    if (error.code === 'permission-denied') throw new Error("Cette LOVEBOX n'est pas encore disponible.")
+    throw error
+  }
 }

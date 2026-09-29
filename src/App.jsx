@@ -4,6 +4,7 @@ import { StudioProvider } from './contexts/StudioContext'
 import Home from './pages/Home'
 import Studio from './pages/Studio'
 import Recipient from './pages/Recipient'
+import PaymentReturn from './pages/PaymentReturn'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/studio" element={<StudioProvider><Studio /></StudioProvider>} />
+        <Route path="/paiement/retour" element={<PaymentReturn />} />
         <Route path="/box/:loveboxId" element={<LoveBoxProvider><Recipient /></LoveBoxProvider>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -1,14 +1,36 @@
-import { createContext, useState, useCallback } from 'react'
+import { createContext, useState, useCallback, useEffect } from 'react'
 
 export const StudioContext = createContext()
 
+// Le brouillon survit a un aller-retour vers la page de paiement (onglet courant uniquement).
+export const DRAFT_KEY = 'lovebox:studio-draft'
+
+const EMPTY_DRAFT = {
+  recipientName: '', recipientEmail: '', creatorEmail: '', occasion: '',
+  photos: [], video: null, audioIntro: null, audioLetter: null,
+  letter: '', tier: 'classic',
+}
+
+function loadDraft() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(DRAFT_KEY))
+    if (saved?.studioData) return { step: saved.step || 1, studioData: { ...EMPTY_DRAFT, ...saved.studioData } }
+  } catch { /* stockage indisponible : on repart de zero */ }
+  return { step: 1, studioData: EMPTY_DRAFT }
+}
+
+export function clearStudioDraft() {
+  try { sessionStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+}
+
 export function StudioProvider({ children }) {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [studioData, setStudioData] = useState({
-    recipientName: '', recipientEmail: '', occasion: '',
-    photos: [], video: null, audioIntro: null, audioLetter: null,
-    letter: '', tier: 'classic',
-  })
+  const [initial] = useState(loadDraft)
+  const [currentStep, setCurrentStep] = useState(initial.step)
+  const [studioData, setStudioData] = useState(initial.studioData)
+
+  useEffect(() => {
+    try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ step: currentStep, studioData })) } catch { /* ignore */ }
+  }, [currentStep, studioData])
 
   const updateField = useCallback((field, value) => {
     setStudioData((prev) => ({ ...prev, [field]: value }))
