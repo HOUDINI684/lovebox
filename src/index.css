@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  background: #0B0B0D;
+  color: #F3EEE3;
+}
+
+@layer base {
+  .font-display { font-weight: 600; letter-spacing: 0.01em; }
+}
+
+.gold-text {
+  background: linear-gradient(180deg, #F8E7AE 0%, #D4AF37 58%, #A8842A 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); opacity: 0.15; }
+  50% { transform: translateY(-26px); opacity: 0.85; }
+}
+.dust { animation: floaty 7s ease-in-out infinite; box-shadow: 0 0 8px rgba(243, 217, 138, 0.8); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
